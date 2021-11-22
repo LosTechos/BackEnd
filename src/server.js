@@ -100,6 +100,7 @@ async function deadpool(req, res, q){
         return result;
     } catch (err) {
         console.error("SQL Error", err);
+        res.send({"SQL Error": err});
     }
 
 }
@@ -128,16 +129,22 @@ app.get('/api/user/:uId',protectedRoutes, (req, res) => {
     const{uId} = req.params;
     let q = `SelectUserOwner ${uId};`;
     deadpool(req, res,q);
+    
 });
 
-app.post('/api/userRegister',protectedRoutes, (req, res) => {
+app.post('/api/userRegister', protectedRoutes, (req, res) => {
     let _bd = req.body;
     let pass = _bd.uPwdHash
 
     bcrypt.hash(pass,8,async function(err,Hash){
-        let q = `AddUserOwner '${_bd.uName}','${Hash}','${_bd.uEmail}','${_bd.uPhone}',${_bd.roId};`;
-        deadpool(req, res,q);
-    })
+        if(err){
+            res.json({"Error hashing":err})
+        }else{
+            let q = `AddUserOwner '${_bd.uName}','${Hash}','${_bd.uEmail}','${_bd.uPhone}',${_bd.roId}, ${_bd.hNumber}, '${_bd.hAddress}', ${_bd.hMonthlyMount};`;
+            deadpool(req, res,q);
+            res.json({"success":"User registered successfully"})
+        }
+    });
 });
 
  app.put('/api/userUpdate',protectedRoutes, (req, res) => {
@@ -210,7 +217,7 @@ app.post('/api/paymentRegister',protectedRoutes, (req, res) => {
 
  app.delete('/api/paymentDelete/:pId',protectedRoutes, (req, res) => {
      const{pId} = req.params;
-     let q = `DeletePayment ${pId}`
+     let q = `DeletePayment ${pId}`;
      deadpool(req, res,q);
  });
 
@@ -233,7 +240,12 @@ app.post('/api/paymentRegister',protectedRoutes, (req, res) => {
         await pool.connect();
         let result = await pool.request().query(q);
         let passIntheDatabase = result.recordset[0].uPwdHash;//hash
-        
+        if(!result.recordset[0]){
+            res.json({
+                access:false,
+                message:"User does not exist"
+            });
+        }
         bcrypt.compare(pass,passIntheDatabase, function(err,_res){
             if(_res==true){
                 let _user = result.recordset[0];//it is here so you can query for more columns
@@ -254,7 +266,7 @@ app.post('/api/paymentRegister',protectedRoutes, (req, res) => {
                         token:token,
                         id: result.recordset[0].uId,//optional
                         roId:result.recordset[0].roId
-                    })
+                    });
                 }
                 else{
                     res.json({
@@ -262,6 +274,12 @@ app.post('/api/paymentRegister',protectedRoutes, (req, res) => {
                         message:'Not valid credentials'
                     })
                 }
+            }else{
+                res.json({
+                    access:false,
+                    message:'Invalid password',
+                    error:err
+                });
             }
         });
     } catch(err){ 
