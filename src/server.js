@@ -132,7 +132,7 @@ app.get('/api/user/:uId',protectedRoutes, (req, res) => {
     
 });
 
-app.post('/api/userRegister', protectedRoutes, (req, res) => {
+app.post('/api/userRegister', (req, res) => {
     let _bd = req.body;
     let pass = _bd.uPwdHash
 
