@@ -2,6 +2,14 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const sql = require('mssql');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
+//documentation
+const swaggerUi = require('swagger-ui-express');
+
+//documentation
+const swaggerDocument = require("../swagger.json");
 
 const app = express();
 
@@ -19,6 +27,9 @@ const connectionString = {
     }
 }
 
+const protectedRoutes = express.Router();
+
+app.set('secret',process.env.JWT_KEY);
 app.use(bodyParser.json({limit:'100mb'}));
 app.use(bodyParser.urlencoded({
     extended: true,
@@ -33,6 +44,27 @@ app.all('*', function(req,res,next){
     next();
 });
 
+protectedRoutes.use((req,res,next)=>{
+    const token = req.headers['access-token'];
+
+    if(token){
+        jwt.verify(token,app.get('secret'),(err, decoded)=>{
+            if(err){
+                return res.json({message:"Invalid token"})
+            }
+            else{
+                req.encoded = decoded;
+            }
+            next();
+        })
+    }
+    else{
+        res.send({
+            message: 'Token not provided'
+        })
+    }
+});
+
 const pool = new sql.ConnectionPool(connectionString);
 const poolConnect = pool.connect();
 
@@ -40,7 +72,7 @@ pool.on('error', err=>{
     console.log(err);
 });
 
-app.get('/', function(req,res){
+app.get('/', protectedRoutes, function(req,res){
     res.send('Goodness');
 });
 
@@ -78,33 +110,39 @@ async function deadpool(req, res, q){
 }
 
 
+//documentation
+app.use('/api',swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-/////////////////////////////////////////// --- Register User --- ///////////////////////////////////////////
+/////////////////////////////////////////// --- User --- ///////////////////////////////////////////
 
- app.get('/api/users', (req, res) => {
+ app.get('/api/users',protectedRoutes, (req, res) => {
      let q = 'SelectAllUserOwners;';
      deadpool(req, res,q);
  });
 
-app.get('/api/user/:uId', (req, res) => {
+app.get('/api/user/:uId',protectedRoutes, (req, res) => {
     const{uId} = req.params;
     let q = `SelectUserOwner ${uId};`;
     deadpool(req, res,q);
 });
 
-app.post('/api/userRegister', (req, res) => {
+app.post('/api/userRegister',protectedRoutes, (req, res) => {
     let _bd = req.body;
-    let q = `AddUserOwner '${_bd.uName}','${_bd.uPwdHash}','${_bd.uEmail}','${_bd.uPhone}',${_bd.roId};`;
-    deadpool(req, res,q);
+    let pass = _bd.uPwdHash
+
+    bcrypt.hash(pass,8,async function(err,Hash){
+        let q = `AddUserOwner '${_bd.uName}','${Hash}','${_bd.uEmail}','${_bd.uPhone}',${_bd.roId};`;
+        deadpool(req, res,q);
+    })
 });
 
- app.put('/api/userUpdate', (req, res) => {
+ app.put('/api/userUpdate',protectedRoutes, (req, res) => {
      let _bd = req.body;
      let q = `UpdateUserOwner ${_bd.uId},'${_bd.uName}','${_bd.uPwdHash}','${_bd.uEmail}','${_bd.uPhone}',${_bd.roId};`;
      deadpool(req, res,q);
  });
 
- app.delete('/api/userDelete/:uId', (req, res) => {
+ app.delete('/api/userDelete/:uId',protectedRoutes, (req, res) => {
      const{uId} = req.params;
      let q = `DeleteUserOwner ${uId};`;
      deadpool(req, res,q);
@@ -112,30 +150,30 @@ app.post('/api/userRegister', (req, res) => {
 
 /////////////////////////////////////////// --- House --- ///////////////////////////////////////////
 
-app.get('/api/houses', (req, res) => {
+app.get('/api/houses',protectedRoutes, (req, res) => {
     let q = `SelectAllHouses;`;
     deadpool(req, res,q);
 });
 
-app.get('/api/house/:hId', (req, res) => {
+app.get('/api/house/:hId',protectedRoutes, (req, res) => {
     const{hId} = req.params;
     let q = `SelectHouse ${hId};`;
     deadpool(req, res,q);
 });
 
-app.post('/api/houseRegister', (req, res) => {
+app.post('/api/houseRegister',protectedRoutes, (req, res) => {
     let _bd = req.body;
     let q = `AddHouse ${_bd.hNumber}, '${_bd.hAddress}', ${_bd.hMonthlyMount};`;
     deadpool(req, res,q);
 });
 
- app.put('/api/houseUpdate', (req, res) => {
+ app.put('/api/houseUpdate',protectedRoutes, (req, res) => {
      let _bd = req.body;
      let q = `UpdateHouse ${_bd.hId}, ${_bd.hNumber}, '${_bd.hAddress}', ${_bd.hMonthlyMount};`;
      deadpool(req, res,q);
  });
 
- app.delete('/api/houseDelete/:hId', (req, res) => {
+ app.delete('/api/houseDelete/:hId',protectedRoutes, (req, res) => {
      const{hId} = req.params;
      let q = `DeleteHouse ${hId};`;
      deadpool(req, res,q);
@@ -143,30 +181,30 @@ app.post('/api/houseRegister', (req, res) => {
 
 /////////////////////////////////////////// --- Payment --- ///////////////////////////////////////////
 
-app.get('/api/Payments', (req, res) => {
+app.get('/api/Payments',protectedRoutes, (req, res) => {
     let q = `SelectAllPayments;`;
     deadpool(req, res,q);
 });
 
-app.get('/api/user/:pId', (req, res) => {
+app.get('/api/user/:pId',protectedRoutes, (req, res) => {
     const{pId} = req.params;
     let q = `SelectPayment ${pId};`;
     deadpool(req, res,q);
 });
 
-app.post('/api/paymentRegister', (req, res) => {
+app.post('/api/paymentRegister',protectedRoutes, (req, res) => {
     let _bd = req.body;
     let q = `AddPayment ${_bd.pAmount}, ${_bd.hNumber};`;
     deadpool(req, res,q);
 });
 
- app.put('/api/paymentUpdate', (req, res) => {
+ app.put('/api/paymentUpdate',protectedRoutes, (req, res) => {
      let _bd = req.body;
      let q = `UpdatePayment ${_bd.pId}, ${_bd.pAmount}, ${_bd.hNumber};`;
      deadpool(req, res,q);
  });
 
- app.delete('/api/paymentDelete/:pId', (req, res) => {
+ app.delete('/api/paymentDelete/:pId',protectedRoutes, (req, res) => {
      const{pId} = req.params;
      let q = `DeletePayment ${pId}`
      deadpool(req, res,q);
@@ -174,14 +212,65 @@ app.post('/api/paymentRegister', (req, res) => {
 
  /////////////////////////////////////////// --- Login --- ///////////////////////////////////////////
 
-// app.post('/api/login',(req,res)=>{
+ app.post('/api/login',async(req,res)=>{
 
-//     let _bd = req.body;
+    let body = req.body;
+    let user = body.uName;
+    let pass = body.uPwdHash;
 
-//     let q = "SELECT roId FROM UserOwner WHERE uName = '"+_bd.uName+"' AND uPwdHash = '"+_bd.uPwdHash+"'";
+    let q = `SELECT * FROM UserOwner WHERE uName ='${user}'`;
 
-//     deadpool(req,res,q);
-// })
+    const pool = new sql.ConnectionPool(connectionString);
+    pool.on('error',err=>{
+        console.log('sql error',err);
+    });
+
+    try{
+        await pool.connect();
+        let result = await pool.request().query(q);
+        let passIntheDatabase = result.recordset[0].uPwdHash;//hash
+        
+        bcrypt.compare(pass,passIntheDatabase, function(err,_res){
+            if(_res==true){
+                let _user = result.recordset[0];//it is here so you can query for more columns
+
+                if(_user !== undefined){
+                    const payload = {
+                        user:_user,
+                        check: true
+                    };
+
+                    const token = jwt.sign(payload,app.get('secret'),{
+                        expiresIn: 1440// sec => 24min
+                    });
+
+                    res.json({
+                        access:true, //optional
+                        message:'Access granted',  //optional
+                        token:token,
+                        id: result.recordset[0].uId,//optional
+                        roId:result.recordset[0].roId
+                    })
+                }
+                else{
+                    res.json({
+                        access:false,
+                        message:'Not valid credentials'
+                    })
+                }
+            }else{
+                res.json({
+                    access:false,
+                    message:'Not valid credentials'
+                })
+                }
+
+        });
+    } catch(err){ 
+        console.log(err);
+    };
+
+})
 
 
 /////////////////////////////////////////// --- End --- ///////////////////////////////////////////
