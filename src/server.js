@@ -100,7 +100,7 @@ async function deadpool(req, res, q){
         return result;
     } catch (err) {
         console.error("SQL Error", err);
-        res.send({"SQL Error": err});
+        res.send({sql_error: err});
     }
 
 }
@@ -138,11 +138,11 @@ app.post('/api/userRegister', (req, res) => {
 
     bcrypt.hash(pass,8,async function(err,Hash){
         if(err){
-            res.json({"Error hashing":err})
+            res.json({error:err})
         }else{
             let q = `AddUserOwner '${_bd.uName}','${Hash}','${_bd.uEmail}','${_bd.uPhone}',${_bd.roId}, ${_bd.hNumber}, '${_bd.hAddress}', ${_bd.hMonthlyMount};`;
             deadpool(req, res,q);
-            res.json({"success":"User registered successfully"})
+            res.json({success:"User registered successfully"})
         }
     });
 });
@@ -155,7 +155,7 @@ app.post('/api/userRegister', (req, res) => {
 
  app.delete('/api/userDelete/:uId',protectedRoutes, (req, res) => {
      const{uId} = req.params;
-     let q = `DeleteUserOwner ${uId};`;
+     let q = `DeleteHouse ${uId};`; //This deletes all record related with the user (house and payments)
      deadpool(req, res,q);
  });
 
@@ -172,21 +172,9 @@ app.get('/api/house/:hId',protectedRoutes, (req, res) => {
     deadpool(req, res,q);
 });
 
-app.post('/api/houseRegister',protectedRoutes, (req, res) => {
-    let _bd = req.body;
-    let q = `AddHouse ${_bd.hNumber}, '${_bd.hAddress}', ${_bd.hMonthlyMount};`;
-    deadpool(req, res,q);
-});
-
  app.put('/api/houseUpdate',protectedRoutes, (req, res) => {
      let _bd = req.body;
      let q = `UpdateHouse ${_bd.hId}, ${_bd.hNumber}, '${_bd.hAddress}', ${_bd.hMonthlyMount};`;
-     deadpool(req, res,q);
- });
-
- app.delete('/api/houseDelete/:hId',protectedRoutes, (req, res) => {
-     const{hId} = req.params;
-     let q = `DeleteHouse ${hId};`;
      deadpool(req, res,q);
  });
 
@@ -263,9 +251,9 @@ app.post('/api/paymentRegister',protectedRoutes, (req, res) => {
                     res.json({
                         access:true, //optional
                         message:'Access granted',  //optional
-                        token:token,
-                        id: result.recordset[0].uId,//optional
-                        roId:result.recordset[0].roId
+                        token:token, 
+                        id: result.recordset[0].uId,//optional //user id
+                        roId:result.recordset[0].roId// role id
                     });
                 }
                 else{
