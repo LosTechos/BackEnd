@@ -1,0 +1,985 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Api los techos",
+    "description": "Se encarga de manejar las peticiones del sitio web y la app",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:40000/api"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Endpoints"
+    }
+  ],
+  "paths": {
+    "/userRegister": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Insert user",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/access-token"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BodyUserPost"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "(ok) information storaged successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get all users",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/access-token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "(ok) information storaged successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseUsersGet"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/user/{uId}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get a specific user",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/access-token"
+          },
+          {
+            "name": "uId",
+            "in": "path",
+            "description": "User ID",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "(ok) information storaged successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseUsersGet"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/userUpdate": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Update a user",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/access-token"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BodyUserPut"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "(ok) information storaged successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/userDelete/{uId}": {
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Delete user",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/access-token"
+          },
+          {
+            "name": "uId",
+            "in": "path",
+            "description": "User ID",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "(ok) user deleted"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/houses": {
+      "get": {
+        "tags": [
+          "Houses"
+        ],
+        "summary": "Get all houses",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/access-token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "(ok) information storaged successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseHouseGet"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/house/{hId}": {
+      "get": {
+        "tags": [
+          "Houses"
+        ],
+        "summary": "Get a specific house",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/access-token"
+          },
+          {
+            "name": "hId",
+            "in": "path",
+            "description": "House ID",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "(ok) information storaged successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseHouseGet"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/houseUpdate": {
+      "put": {
+        "tags": [
+          "Houses"
+        ],
+        "summary": "Update a house",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/access-token"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BodyHousePut"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "(ok) information storaged successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/paymentRegister": {
+      "post": {
+        "tags": [
+          "Payment"
+        ],
+        "summary": "Register a payment",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/access-token"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BodyPaymentPost"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "(ok) information storaged successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/Payments": {
+      "get": {
+        "tags": [
+          "Payment"
+        ],
+        "summary": "Get all payments",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/access-token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "(ok) information storaged successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponsePaymentGet"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/payment/{pId}": {
+      "get": {
+        "tags": [
+          "Payment"
+        ],
+        "summary": "Get a specific payment",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/access-token"
+          },
+          {
+            "name": "pId",
+            "in": "path",
+            "description": "Payment ID",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "(ok) information storaged successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponsePaymentGet"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/paymentUpdate": {
+      "put": {
+        "tags": [
+          "Payment"
+        ],
+        "summary": "User upload the img",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/access-token"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BodyPymentPut"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "(ok) information storaged successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/paymentUpdateA": {
+      "put": {
+        "tags": [
+          "Payment"
+        ],
+        "summary": "Admin validates the ticket",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/access-token"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BodyPymentAPut"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "(ok) information storaged successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/paymentDelete/{pId}": {
+      "delete": {
+        "tags": [
+          "Payment"
+        ],
+        "summary": "Delete payment",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/access-token"
+          },
+          {
+            "name": "pId",
+            "in": "path",
+            "description": "Payment ID",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "(ok) user deleted"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "Login"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BodyLogin"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "(ok) information storaged successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/debt/{uId}": {
+      "get": {
+        "tags": [
+          "DebtView"
+        ],
+        "summary": "Get a specific debt(Working on it)",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/access-token"
+          },
+          {
+            "name": "pId",
+            "in": "path",
+            "description": "Payment ID",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "(ok) information storaged successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponsePaymentGet"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/debt": {
+      "get": {
+        "tags": [
+          "DebtView"
+        ],
+        "summary": "Get all debts(Working on it)",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/access-token"
+          },
+          {
+            "name": "pId",
+            "in": "path",
+            "description": "Payment ID",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "(ok) information storaged successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDebtsGet"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "responses": {
+      "Unauthorized": {
+        "description": "(Unauthorized) there is no valid authorization to use the service"
+      },
+      "NotFound": {
+        "description": "(NotFound) no data found"
+      },
+      "BadRequest": {
+        "description": "(BadRequest) the data is incorrect or incomplete"
+      },
+      "ServerError": {
+        "description": "Server error"
+      }
+    },
+    "parameters": {
+      "access-token": {
+        "name": "access-token",
+        "in": "header",
+        "description": "Token to validate the user",
+        "required": true
+      }
+    },
+    "schemas": {
+      "BodyUserPost": {
+        "type": "object",
+        "properties": {
+          "uName": {
+            "type": "varchar(64)",
+            "description": "User name"
+          },
+          "uPwdHash": {
+            "type": "nvarchar(128)",
+            "description": "User password"
+          },
+          "uEmail": {
+            "type": "varchar(32)",
+            "description": "User Email"
+          },
+          "uPhone": {
+            "type": "varchar(17)",
+            "description": "User phone"
+          },
+          "roId": {
+            "type": "int",
+            "description": "User role id"
+          },
+          "hNumber": {
+            "type": "int",
+            "description": "House number"
+          },
+          "hAddress": {
+            "type": "varchar(32)",
+            "description": "House address"
+          },
+          "hMonthlyMount": {
+            "type": "int",
+            "description": "MonthlyMount"
+          }
+        }
+      },
+      "BodyUserPut": {
+        "type": "object",
+        "properties": {
+          "uId": {
+            "type": "Int",
+            "description": "User ID"
+          },
+          "uEmail": {
+            "type": "varchar(32)",
+            "description": "User Email"
+          },
+          "uPhone": {
+            "type": "varchar(17)",
+            "description": "User phone"
+          }
+        }
+      },
+      "ResponseUsersGet": {
+        "type": "object",
+        "properties": {
+          "uId": {
+            "type": "int",
+            "description": "User ID"
+          },
+          "uName": {
+            "type": "varchar(64)",
+            "description": "User name"
+          },
+          "uPwdHash": {
+            "type": "nvarchar(128)",
+            "description": "User password"
+          },
+          "uEmail": {
+            "type": "varchar(32)",
+            "description": "User Email"
+          },
+          "uPhone": {
+            "type": "varchar(17)",
+            "description": "User phone"
+          },
+          "uTimeStamp": {
+            "type": "datetime",
+            "description": "Time when the user was created"
+          },
+          "hId": {
+            "type": "int",
+            "description": "House ID"
+          },
+          "roId": {
+            "type": "int",
+            "description": "User role id"
+          }
+        }
+      },
+      "BodyHousePut": {
+        "type": "object",
+        "properties": {
+          "hId": {
+            "type": "int",
+            "description": "House number"
+          },
+          "hNumber": {
+            "type": "int",
+            "description": "House number"
+          },
+          "hAddress": {
+            "type": "varchar(64)",
+            "description": "House Address"
+          },
+          "hMonthlyMount": {
+            "type": "int",
+            "description": "Mounthly mount"
+          }
+        }
+      },
+      "ResponseHouseGet": {
+        "type": "object",
+        "properties": {
+          "hId": {
+            "type": "int",
+            "description": "House ID"
+          },
+          "hNumber": {
+            "type": "int",
+            "description": "House number"
+          },
+          "hAddress": {
+            "type": "varchar(64)",
+            "description": "House Address"
+          },
+          "hDebt": {
+            "type": "int",
+            "description": "House debt"
+          },
+          "hMonthlyMount": {
+            "type": "int",
+            "description": "Mounthly mount"
+          },
+          "isPaid": {
+            "type": "bit",
+            "description": "The debt is paid"
+          },
+          "uId": {
+            "type": "int",
+            "description": "User ID"
+          }
+        }
+      },
+      "BodyPaymentPost": {
+        "type": "object",
+        "properties": {
+          "pAmount": {
+            "type": "int",
+            "description": "Payment amount"
+          },
+          "hId": {
+            "type": "int",
+            "description": "House ID"
+          }
+        }
+      },
+      "ResponsePaymentGet": {
+        "type": "object",
+        "properties": {
+          "pId": {
+            "type": "int",
+            "description": "Payment ID"
+          },
+          "pDate": {
+            "type": "int",
+            "description": "Payment date"
+          },
+          "pExpireDate": {
+            "type": "int",
+            "description": "Payment expire date"
+          },
+          "pAmount": {
+            "type": "int",
+            "description": "Payment amount"
+          },
+          "hId": {
+            "type": "int",
+            "description": "House ID"
+          },
+          "isValidated": {
+            "type": "bit",
+            "description": "The admin validates the payment"
+          },
+          "pImage": {
+            "type": "image",
+            "description": "Payment ticket"
+          }
+        }
+      },
+      "ResponseDebtsGet": {
+        "type": "object",
+        "properties": {
+          "uName": {
+            "type": "int",
+            "description": "Payment ID"
+          },
+          "hDebt": {
+            "type": "int",
+            "description": "Payment date"
+          },
+          "pExpireDate": {
+            "type": "int",
+            "description": "Payment expire date"
+          },
+          "pAmount": {
+            "type": "int",
+            "description": "Payment amount"
+          },
+          "hId": {
+            "type": "int",
+            "description": "House ID"
+          },
+          "isValidated": {
+            "type": "bit",
+            "description": "The admin validates the payment"
+          },
+          "pImage": {
+            "type": "image",
+            "description": "Payment ticket"
+          }
+        }
+      },
+      "BodyPymentPut": {
+        "type": "object",
+        "properties": {
+          "pId": {
+            "type": "int",
+            "description": "Payment ID"
+          },
+          "pImage": {
+            "type": "Image",
+            "description": "Ticket"
+          }
+        }
+      },
+      "BodyPymentAPut": {
+        "type": "object",
+        "properties": {
+          "pId": {
+            "type": "int",
+            "description": "Payment ID"
+          },
+          "pAmount": {
+            "type": "int",
+            "description": "Payment Amount"
+          },
+          "isValidated": {
+            "type": "bit",
+            "description": "The admin validates the payment"
+          }
+        }
+      },
+      "BodyLogin": {
+        "type": "object",
+        "properties": {
+          "uName": {
+            "type": "int",
+            "description": "User"
+          },
+          "uPwdHash": {
+            "type": "nvarchar(128)",
+            "description": "Password"
+          }
+        }
+      }
+    }
+  }
+}

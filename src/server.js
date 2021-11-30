@@ -5,6 +5,11 @@ const sql = require('mssql');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+//documentation
+const swaggerUi = require('swagger-ui-express');
+
+//documentation
+const swaggerDocument = require("../swagger.json");
 
 const app = express();
 
@@ -97,12 +102,17 @@ async function deadpool(req, res, q){
                 res.send(result.recordset);
             }
         }
+        return result;
     } catch (err) {
         console.error("SQL Error", err);
         res.send({sql_error: err});
     }
 
 }
+
+
+//documentation
+app.use('/api-docs',swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 /////////////////////////////////////////// --- Debt views --- ///////////////////////////////////////////
 
@@ -130,7 +140,7 @@ app.get('/api/user/:uId',protectedRoutes, (req, res) => {
     deadpool(req, res,q);
 });
 
-app.post('/api/userRegister', (req, res) => {
+app.post('/api/userRegister',protectedRoutes, (req, res) => {
     let _bd = req.body;
     let pass = _bd.uPwdHash;
 
@@ -147,7 +157,7 @@ app.post('/api/userRegister', (req, res) => {
 
  app.put('/api/userUpdate',protectedRoutes, (req, res) => {
      let _bd = req.body;
-     let q = `UpdateUserOwner ${_bd.uId},'${_bd.uName}','${_bd.uPwdHash}','${_bd.uEmail}','${_bd.uPhone}',${_bd.roId};`;
+     let q = `UpdateUserOwner ${_bd.uId},'${_bd.uEmail}','${_bd.uPhone}';`;
      deadpool(req, res,q);
      res.json({success:"User updated"});
  });
@@ -181,12 +191,12 @@ app.get('/api/house/:hId',protectedRoutes, (req, res) => {
 
 /////////////////////////////////////////// --- Payment --- ///////////////////////////////////////////
 
-app.get('/api/Payments',protectedRoutes, (req, res) => {
+app.get('/api/payments',protectedRoutes, (req, res) => {
     let q = `SelectAllPayments;`;
     deadpool(req, res,q);
 });
 
-app.get('/api/user/:pId',protectedRoutes, (req, res) => {
+app.get('/api/payment/:pId',protectedRoutes, (req, res) => {
     const{pId} = req.params;
     let q = `SelectPayment ${pId};`;
     deadpool(req, res,q);
@@ -199,7 +209,7 @@ app.post('/api/paymentRegister',protectedRoutes, (req, res) => {
     res.json({success:"Payment done"});
 });
 
- app.put('/api/paymentUpdate',protectedRoutes, (req, res) => {
+app.put('/api/paymentUpdate',protectedRoutes, (req, res) => {
      let _bd = req.body;
      let q = `UpdatePayment ${_bd.pId}, ${_bd.pAmount}, ${_bd.hNumber};`;
      deadpool(req, res,q);
