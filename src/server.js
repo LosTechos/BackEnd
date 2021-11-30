@@ -51,12 +51,12 @@ protectedRoutes.use((req,res,next)=>{
                 req.encoded = decoded;
             }
             next();
-        })
+        });
     }
     else{
         res.send({
             message: 'Token not provided'
-        })
+        });
     }
 });
 
@@ -97,7 +97,6 @@ async function deadpool(req, res, q){
                 res.send(result.recordset);
             }
         }
-        return result;
     } catch (err) {
         console.error("SQL Error", err);
         res.send({sql_error: err});
@@ -129,20 +128,19 @@ app.get('/api/user/:uId',protectedRoutes, (req, res) => {
     const{uId} = req.params;
     let q = `SelectUserOwner ${uId};`;
     deadpool(req, res,q);
-    
 });
 
 app.post('/api/userRegister', (req, res) => {
     let _bd = req.body;
-    let pass = _bd.uPwdHash
+    let pass = _bd.uPwdHash;
 
     bcrypt.hash(pass,8,async function(err,Hash){
         if(err){
-            res.json({error:err})
+            res.json({error:err});
         }else{
             let q = `AddUserOwner '${_bd.uName}','${Hash}','${_bd.uEmail}','${_bd.uPhone}',${_bd.roId}, ${_bd.hNumber}, '${_bd.hAddress}', ${_bd.hMonthlyMount};`;
             deadpool(req, res,q);
-            res.json({success:"User registered successfully"})
+            res.json({success:"User registered successfully"});
         }
     });
 });
@@ -151,12 +149,14 @@ app.post('/api/userRegister', (req, res) => {
      let _bd = req.body;
      let q = `UpdateUserOwner ${_bd.uId},'${_bd.uName}','${_bd.uPwdHash}','${_bd.uEmail}','${_bd.uPhone}',${_bd.roId};`;
      deadpool(req, res,q);
+     res.json({success:"User updated"});
  });
 
  app.delete('/api/userDelete/:uId',protectedRoutes, (req, res) => {
      const{uId} = req.params;
      let q = `DeleteHouse ${uId};`; //This deletes all record related with the user (house and payments)
      deadpool(req, res,q);
+     res.json({success:"User deleted"});
  });
 
 /////////////////////////////////////////// --- House --- ///////////////////////////////////////////
@@ -176,6 +176,7 @@ app.get('/api/house/:hId',protectedRoutes, (req, res) => {
      let _bd = req.body;
      let q = `UpdateHouse ${_bd.hId}, ${_bd.hNumber}, '${_bd.hAddress}', ${_bd.hMonthlyMount};`;
      deadpool(req, res,q);
+     res.json({success:"House updated"});
  });
 
 /////////////////////////////////////////// --- Payment --- ///////////////////////////////////////////
@@ -195,18 +196,21 @@ app.post('/api/paymentRegister',protectedRoutes, (req, res) => {
     let _bd = req.body;
     let q = `AddPayment ${_bd.pAmount}, ${_bd.hNumber};`;
     deadpool(req, res,q);
+    res.json({success:"Payment done"});
 });
 
  app.put('/api/paymentUpdate',protectedRoutes, (req, res) => {
      let _bd = req.body;
      let q = `UpdatePayment ${_bd.pId}, ${_bd.pAmount}, ${_bd.hNumber};`;
      deadpool(req, res,q);
+     res.json({success:"Payment updated"});
  });
 
  app.delete('/api/paymentDelete/:pId',protectedRoutes, (req, res) => {
      const{pId} = req.params;
      let q = `DeletePayment ${pId}`;
      deadpool(req, res,q);
+     res.json({success:"Payment deleted"});
  });
 
  /////////////////////////////////////////// --- Login --- ///////////////////////////////////////////
@@ -251,7 +255,7 @@ app.post('/api/paymentRegister',protectedRoutes, (req, res) => {
                     res.json({
                         access:true, //optional
                         message:'Access granted',  //optional
-                        token:token, 
+                        token:token,
                         id: result.recordset[0].uId,//optional //user id
                         roId:result.recordset[0].roId// role id
                     });
@@ -273,8 +277,7 @@ app.post('/api/paymentRegister',protectedRoutes, (req, res) => {
     } catch(err){ 
         console.log(err);
     };
-
-})
+});
 
 
 /////////////////////////////////////////// --- End --- ///////////////////////////////////////////
