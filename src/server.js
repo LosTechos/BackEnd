@@ -232,6 +232,7 @@ app.post('/api/paymentRegister',protectedRoutes, (req, res) => {
         await pool.connect();
         let result = await pool.request().query(q);
         let passIntheDatabase = result.recordset[0].uPwdHash;//hash
+        console.log(result);
         if(!result.recordset[0]){
             res.json({
                 access:false,
@@ -275,7 +276,11 @@ app.post('/api/paymentRegister',protectedRoutes, (req, res) => {
             }
         });
     } catch(err){ 
-        console.log(err);
+        res.json({
+            access:false,
+            message:'User does not exist',
+            error:err
+        });
     };
 });
 
