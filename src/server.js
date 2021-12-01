@@ -101,6 +101,7 @@ async function deadpool(req, res, q){
              if (result.recordset.length > 0) {
                 res.send(result.recordset);
             }
+            res.json({message:"No me desmadres más la API, culero."});
             return result;
         }
         return result;
@@ -139,7 +140,7 @@ app.get('/api/user/:uId',protectedRoutes, (req, res) => {
     const{uId} = req.params;
     let q = `SelectUserOwner ${uId};`;
     deadpool(req, res,q);
-    res.json({message:"No me desmadres más la API, culero."});
+    
 });
 
 app.post('/api/userRegister',protectedRoutes, (req, res) => {
@@ -182,7 +183,6 @@ app.get('/api/house/:hId',protectedRoutes, (req, res) => {
     const{hId} = req.params;
     let q = `SelectHouse ${hId};`;
     deadpool(req, res,q);
-    res.json({message:"No me desmadres más la API, culero."});
 });
 
  app.put('/api/houseUpdate',protectedRoutes, (req, res) => {
