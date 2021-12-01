@@ -118,12 +118,12 @@ app.use('/api-docs',swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get('/api/debt/:uId', (req, res) => {
     const{uId} = req.params;
-    let q = `UserDebt_v ${uId};`;
+    let q = `SELECT * from UserDebt_v(${uId});`;
     deadpool(req, res,q);
 });
 
 app.get('/api/debt', (req, res) => {
-    let q = `AllUserDebt_v;`;
+    let q = `SELECT * from AllUserDebt_v;`;
     deadpool(req, res,q);
 });
 
