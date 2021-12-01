@@ -148,7 +148,7 @@ app.post('/api/userRegister',protectedRoutes, (req, res) => {
 
     bcrypt.hash(pass,8,async function(err,Hash){
         if(err){
-            res.json({error:err});
+            res.json({error:"BASTA PRRO"});
         }else{
             let q = `AddUserOwner '${_bd.uName}','${Hash}','${_bd.uEmail}','${_bd.uPhone}',${_bd.roId}, ${_bd.hNumber}, '${_bd.hAddress}', ${_bd.hMonthlyMount};`;
             deadpool(req, res,q);
