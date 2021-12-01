@@ -116,6 +116,13 @@ async function deadpool(req, res, q){
 //documentation
 app.use('/api-docs',swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
+/////////////////////////////////////////// --- Get budget --- ///////////////////////////////////////////
+
+app.get('/api/budget', protectedRoutes, (req, res)=>{
+    let q = `SELECT bTotal AS "budget" FROM cBudget`;
+    deadpool(req, res, q);
+});
+
 /////////////////////////////////////////// --- Debt views --- ///////////////////////////////////////////
 
 app.get('/api/debt/:uId', (req, res) => {
