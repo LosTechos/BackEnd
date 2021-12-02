@@ -231,7 +231,7 @@ app.put('/api/paymentUpdate',protectedRoutes, (req, res) => {
 
 /////////////////////////////////////////// --- Upload Image --- ///////////////////////////////////////////
 
-app.post('/api/upload', protectedRoutes,(res, req)=>{ /// user uploads image to payment
+app.post('/api/upload',(res, req)=>{ /// user uploads image to payment
     const {uId, pImage} = req.body;
     res.json({"hola":"upload endpoint"})
     let q = `UploadImage ${pImage}, ${uId}`;
