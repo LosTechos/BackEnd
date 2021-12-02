@@ -54,7 +54,6 @@ protectedRoutes.use((req,res,next)=>{
             }
             else{
                 req.encoded = decoded;
-                res.json({"hola":"token decoded"})
             }
             next();
         });
