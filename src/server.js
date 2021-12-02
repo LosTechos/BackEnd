@@ -44,11 +44,8 @@ app.all('*', function(req,res,next){
     next();
 });
 
-app.options
-
 protectedRoutes.use((req,res,next)=>{
     const token = req.headers['access-token'];
-    res.json({"hola":11})
 
     if(token){
         jwt.verify(token,app.get('secret'),(err, decoded)=>{
@@ -57,6 +54,7 @@ protectedRoutes.use((req,res,next)=>{
             }
             else{
                 req.encoded = decoded;
+                res.json({"hola":"token decoded"})
             }
             next();
         });
@@ -236,9 +234,10 @@ app.put('/api/paymentUpdate',protectedRoutes, (req, res) => {
 
 app.put('/api/upload', protectedRoutes,(res, req)=>{ /// user uploads image to payment
     const {uId, pImage} = req.body;
+    res.json({"hola":"upload endpoint"})
     let q = `UploadImage ${pImage}, ${uId}`;
     deadpool(req, res, q);
-    res.json('Payment done, waiting for confirmation.')
+    res.json('Payment done, waiting for confirmation.');
 });
 
 /////////////////////////////////////////// --- Verify Payment --- ///////////////////////////////////////////
