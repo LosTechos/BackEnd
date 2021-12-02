@@ -40,9 +40,11 @@ app.use(cors());
 app.all('*', function(req,res,next){
     res.header('Access-Control-Allow-Origin','*');
     res.header('Access-Control-Allow-Methods','PUT,GET,POST,DELETE,OPTIONS');
-    res.header('Access-Control-Allow-Headers','Content-Type');
+    res.header('Access-Control-Allow-Headers','Accept, Content-Type, Authorization, X-Requested-With');
     next();
 });
+
+app.options
 
 protectedRoutes.use((req,res,next)=>{
     const token = req.headers['access-token'];
@@ -77,22 +79,16 @@ app.get('/', protectedRoutes, function(req,res){
 });
 
 async function deadpool(req, res, q){
-    let _bod = req.body;
-
     await poolConnect;
-
     try {
         //LOGIC FOR RUNNING SQL QUERY
         const request = pool.request();
         const result = await request.query(q);
-        console.dir(result);
-        console.log(result);
-
         if (result.recordset) {
              if (result.recordset.length > 0) {
                 res.send(result.recordset);
             }
-            res.json({message:"No me desmadres más la API, culero."});
+            res.json({message:"No recordset found."});
             return result;
         }
         return result;
@@ -100,9 +96,7 @@ async function deadpool(req, res, q){
         console.error("SQL Error", err);
         res.send({sql_error: err});
     }
-
 }
-
 
 //documentation
 app.use('/api-docs',swaggerUi.serve, swaggerUi.setup(swaggerDocument));
