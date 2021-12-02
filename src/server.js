@@ -76,15 +76,6 @@ app.get('/', protectedRoutes, function(req,res){
     res.send('Goodness');
 });
 
-app.get('/api/hello', function(req,res){
-    res.send({message:"buenas"}); 
-});
-
-// Select * FROM Producs
-app.get('/api/myselectquery',(req,res)=>{
-    deadpool(req,res);
-});
-
 async function deadpool(req, res, q){
     let _bod = req.body;
 
@@ -123,13 +114,6 @@ app.get('/api/budget', protectedRoutes, (req, res)=>{
     deadpool(req, res, q);
 });
 
-/////////////////////////////////////////// --- Get Image --- ///////////////////////////////////////////
-
-app.put('/api/ticket', (req, res)=>{
-    console.log(req.body)
-    res.json(req.body)
-});
-
 /////////////////////////////////////////// --- Debt views --- ///////////////////////////////////////////
 
 app.get('/api/debt/:uId', (req, res) => {
@@ -145,10 +129,10 @@ app.get('/api/debt', (req, res) => {
 
 /////////////////////////////////////////// --- User --- ///////////////////////////////////////////
 
- app.get('/api/users',protectedRoutes, (req, res) => {
-     let q = 'SelectAllUserOwners;';
-     deadpool(req, res,q);
- });
+app.get('/api/users',protectedRoutes, (req, res) => {
+    let q = 'SelectAllUserOwners;';
+    deadpool(req, res,q);
+});
 
 app.get('/api/user/:uId',protectedRoutes, (req, res) => {
     const{uId} = req.params;
@@ -171,20 +155,19 @@ app.post('/api/userRegister',protectedRoutes, (req, res) => {
         }
     });
 });
+app.put('/api/userUpdate',protectedRoutes, (req, res) => {
+    let _bd = req.body;
+    let q = `UpdateUserOwner ${_bd.uId},'${_bd.uEmail}','${_bd.uPhone}';`;
+    deadpool(req, res,q);
+    res.json({success:"User updated"});
+});
 
- app.put('/api/userUpdate',protectedRoutes, (req, res) => {
-     let _bd = req.body;
-     let q = `UpdateUserOwner ${_bd.uId},'${_bd.uEmail}','${_bd.uPhone}';`;
-     deadpool(req, res,q);
-     res.json({success:"User updated"});
- });
-
- app.delete('/api/userDelete/:uId',protectedRoutes, (req, res) => {
-     const{uId} = req.params;
-     let q = `DeleteHouse ${uId};`; //This deletes all record related with the user (house and payments)
-     deadpool(req, res,q);
-     res.json({success:"User deleted"});
- });
+app.delete('/api/userDelete/:uId',protectedRoutes, (req, res) => {
+    const{uId} = req.params;
+    let q = `DeleteHouse ${uId};`; //This deletes all record related with the user (house and payments)
+    deadpool(req, res,q);
+    res.json({success:"User deleted"});
+});
 
 /////////////////////////////////////////// --- House --- ///////////////////////////////////////////
 
@@ -199,11 +182,11 @@ app.get('/api/house/:hId',protectedRoutes, (req, res) => {
     deadpool(req, res,q);
 });
 
- app.put('/api/houseUpdate',protectedRoutes, (req, res) => {
-     let _bd = req.body;
-     let q = `UpdateHouse ${_bd.hId}, ${_bd.hNumber}, '${_bd.hAddress}', ${_bd.hMonthlyMount};`;
-     deadpool(req, res,q);
-     res.json({success:"House updated"});
+app.put('/api/houseUpdate',protectedRoutes, (req, res) => {
+    let _bd = req.body;
+    let q = `UpdateHouse ${_bd.hId}, ${_bd.hNumber}, '${_bd.hAddress}', ${_bd.hMonthlyMount};`;
+    deadpool(req, res,q);
+    res.json({success:"House updated"});
  });
 
 /////////////////////////////////////////// --- Payment --- ///////////////////////////////////////////
@@ -227,18 +210,43 @@ app.post('/api/paymentRegister',protectedRoutes, (req, res) => {
 });
 
 app.put('/api/paymentUpdate',protectedRoutes, (req, res) => {
-     let _bd = req.body;
-     let q = `UpdatePayment ${_bd.pId}, ${_bd.pAmount}, ${_bd.hNumber};`;
-     deadpool(req, res,q);
-     res.json({success:"Payment updated"});
+    let _bd = req.body;
+    let q = `UpdatePayment ${_bd.pId}, ${_bd.pAmount}, ${_bd.hNumber};`;
+    deadpool(req, res,q);
+    res.json({success:"Payment updated"});
  });
 
  app.delete('/api/paymentDelete/:pId',protectedRoutes, (req, res) => {
-     const{pId} = req.params;
-     let q = `DeletePayment ${pId}`;
-     deadpool(req, res,q);
-     res.json({success:"Payment deleted"});
- });
+    const{pId} = req.params;
+    let q = `DeletePayment ${pId}`;
+    deadpool(req, res,q);
+    res.json({success:"Payment deleted"});
+});
+
+/////////////////////////////////////////// --- Upload Image --- ///////////////////////////////////////////
+
+app.put('/api/upload', protectedRoutes,(res, req)=>{ /// user uploads image to payment
+    const {uId, pImage} = req.body;
+    let q = `UploadImage ${pImage}, ${uId}`;
+    deadpool(req, res, q);
+    res.json('Payment done, waiting for confirmation.')
+});
+
+/////////////////////////////////////////// --- Verify Payment --- ///////////////////////////////////////////
+
+app.get('/api/verify', protectedRoutes,(res, req)=>{ /// get the image from the id ///
+    const {uId} = req.body;
+    let q = `SelectPaymentImage ${uId}`;
+    deadpool(req, res, q);
+    res.json('Image received.');
+});
+
+app.put('/api/verify', protectedRoutes,(res, req)=>{ /// post the verify and the amount paid ///
+    const {uId, isValidate, paidAmount} = req.body;
+    let q = `VerifyPayment ${isValidate}, ${paidAmount}, ${uId}`;
+    deadpool(req, res, q);
+    res.json('Payment verified.');
+});
 
  /////////////////////////////////////////// --- Login --- ///////////////////////////////////////////
 
