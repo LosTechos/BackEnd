@@ -233,8 +233,7 @@ app.put('/api/paymentUpdate',protectedRoutes, (req, res) => {
 
 app.put('/api/upload', protectedRoutes,(req, res)=>{ /// user uploads image to payment
     const {uId, pImage} = req.body;
-    res.json(pImage.myFile)
-    let q = `UploadImage ${pImage}, ${uId}`;
+    let q = `UploadImage ${pImage.myFile}, ${uId}`;
     deadpool(req, res, q);
     res.json('Payment done, waiting for confirmation.');
 });
