@@ -123,6 +123,13 @@ app.get('/api/budget', protectedRoutes, (req, res)=>{
     deadpool(req, res, q);
 });
 
+/////////////////////////////////////////// --- Get Image --- ///////////////////////////////////////////
+
+app.put('/api/ticket', protectedRoutes, (req, res)=>{
+    console.log(res.body)
+    res.json(res.body)
+});
+
 /////////////////////////////////////////// --- Debt views --- ///////////////////////////////////////////
 
 app.get('/api/debt/:uId', (req, res) => {
@@ -278,7 +285,8 @@ app.put('/api/paymentUpdate',protectedRoutes, (req, res) => {
                         message:'Access granted',  //optional
                         token:token,
                         id: result.recordset[0].uId,//optional //user id
-                        roId:result.recordset[0].roId// role id
+                        roId:result.recordset[0].roId,// role id
+                        uName: result.recordset[0].uName
                     });
                 }
                 else{
