@@ -231,7 +231,7 @@ app.put('/api/paymentUpdate',protectedRoutes, (req, res) => {
 
 /////////////////////////////////////////// --- Upload Image --- ///////////////////////////////////////////
 
-app.post('/api/upload',(res, req)=>{ /// user uploads image to payment
+app.post('/api/upload', protectedRoutes,(req, res)=>{ /// user uploads image to payment
     const {uId, pImage} = req.body;
     res.json({"hola":"upload endpoint"})
     let q = `UploadImage ${pImage}, ${uId}`;
@@ -241,14 +241,14 @@ app.post('/api/upload',(res, req)=>{ /// user uploads image to payment
 
 /////////////////////////////////////////// --- Verify Payment --- ///////////////////////////////////////////
 
-app.get('/api/verify', protectedRoutes,(res, req)=>{ /// get the image from the id ///
+app.get('/api/verify', protectedRoutes,(req, res)=>{ /// get the image from the id ///
     const {uId} = req.body;
     let q = `SelectPaymentImage ${uId}`;
     deadpool(req, res, q);
     res.json('Image received.');
 });
 
-app.put('/api/verify', protectedRoutes,(res, req)=>{ /// post the verify and the amount paid ///
+app.put('/api/verify', protectedRoutes,(req, res)=>{ /// post the verify and the amount paid ///
     const {uId, isValidate, paidAmount} = req.body;
     let q = `VerifyPayment ${isValidate}, ${paidAmount}, ${uId}`;
     deadpool(req, res, q);
