@@ -48,6 +48,7 @@ app.options
 
 protectedRoutes.use((req,res,next)=>{
     const token = req.headers['access-token'];
+    res.json({"hola":11})
 
     if(token){
         jwt.verify(token,app.get('secret'),(err, decoded)=>{
