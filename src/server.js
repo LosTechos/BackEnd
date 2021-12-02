@@ -127,7 +127,7 @@ app.get('/api/budget', protectedRoutes, (req, res)=>{
 
 app.put('/api/ticket', (req, res)=>{
     console.log(req.body)
-    res.json(res.body)
+    res.json(req.body)
 });
 
 /////////////////////////////////////////// --- Debt views --- ///////////////////////////////////////////
