@@ -82,6 +82,7 @@ async function deadpool(req, res, q){
         //LOGIC FOR RUNNING SQL QUERY
         const request = pool.request();
         const result = await request.query(q);
+        res.json({'jj':"Hola"});
         if (result.recordset) {
              if (result.recordset.length > 0) {
                 res.send(result.recordset);
