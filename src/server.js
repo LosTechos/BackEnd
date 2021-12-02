@@ -56,12 +56,12 @@ protectedRoutes.use((req,res,next)=>{
                 req.encoded = decoded;
             }
             next();
-        })
+        });
     }
     else{
         res.send({
             message: 'Token not provided'
-        })
+        });
     }
 });
 
@@ -74,15 +74,6 @@ pool.on('error', err=>{
 
 app.get('/', protectedRoutes, function(req,res){
     res.send('Goodness');
-});
-
-app.get('/api/hello', function(req,res){
-    res.send({message:"buenas"}); 
-});
-
-// Select * FROM Producs
-app.get('/api/myselectquery',(req,res)=>{
-    deadpool(req,res);
 });
 
 async function deadpool(req, res, q){
@@ -101,10 +92,13 @@ async function deadpool(req, res, q){
              if (result.recordset.length > 0) {
                 res.send(result.recordset);
             }
+            res.json({message:"No me desmadres más la API, culero."});
+            return result;
         }
         return result;
     } catch (err) {
         console.error("SQL Error", err);
+        res.send({sql_error: err});
     }
 
 }
@@ -113,16 +107,37 @@ async function deadpool(req, res, q){
 //documentation
 app.use('/api-docs',swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
+/////////////////////////////////////////// --- Get budget --- ///////////////////////////////////////////
+
+app.get('/api/budget', protectedRoutes, (req, res)=>{
+    let q = `SelectBudget`;
+    deadpool(req, res, q);
+});
+
+/////////////////////////////////////////// --- Expenses --- ///////////////////////////////////////////
+
+app.post('/api/expenseRegister', protectedRoutes, (req, res)=>{
+    let _bd = req.body;
+    let q = `AddExpense '${_bd.eTitle}','${_bd.eDescription}',${_bd.eAmount};`;
+    deadpool(req, res, q);
+    res.json({success:"Expense registered successfully"});
+});
+
+app.get('/api/expenses', protectedRoutes, (req, res)=>{
+    let q = `SelectAllExpenses`;
+    deadpool(req, res, q);
+});
+
 /////////////////////////////////////////// --- Debt views --- ///////////////////////////////////////////
 
-app.get('/api/debt/:uId', (req, res) => {
+app.get('/api/debt/:uId', protectedRoutes, (req, res) => {
     const{uId} = req.params;
-    let q = `UserDebt_v ${uId};`;
+    let q = `SELECT * from UserDebt_v(${uId});`;
     deadpool(req, res,q);
 });
 
-app.get('/api/debt', (req, res) => {
-    let q = `AllUserDebt_v;`;
+app.get('/api/debt', protectedRoutes, (req, res) => {
+    let q = `SELECT * from AllUserDebt_v;`;
     deadpool(req, res,q);
 });
 
@@ -134,37 +149,38 @@ app.get('/api/users',protectedRoutes, (req, res) => {
 });
 
 app.get('/api/user/:uId',protectedRoutes, (req, res) => {
-   const{uId} = req.params;
-   let q = `SelectUserOwner ${uId};`;
-   deadpool(req, res,q);
-   
+    const{uId} = req.params;
+    let q = `SelectUserOwner ${uId};`;
+    deadpool(req, res,q);
+    
 });
 
 app.post('/api/userRegister',protectedRoutes, (req, res) => {
-   let _bd = req.body;
-   let pass = _bd.uPwdHash
+    let _bd = req.body;
+    let pass = _bd.uPwdHash;
 
-   bcrypt.hash(pass,8,async function(err,Hash){
-       if(err){
-           res.json({error:err})
-       }else{
-           let q = `AddUserOwner '${_bd.uName}','${Hash}','${_bd.uEmail}','${_bd.uPhone}',${_bd.roId}, ${_bd.hNumber}, '${_bd.hAddress}', ${_bd.hMonthlyMount};`;
-           deadpool(req, res,q);
-           res.json({success:"User registered successfully"})
-       }
-   });
+    bcrypt.hash(pass,8,async function(err,Hash){
+        if(err){
+            res.status(418).json({error:"BASTA PRRO"});
+        }else{
+            let q = `AddUserOwner '${_bd.uName}','${Hash}','${_bd.uEmail}','${_bd.uPhone}',${_bd.roId}, ${_bd.hNumber}, '${_bd.hAddress}', ${_bd.hMonthlyMount};`;
+            deadpool(req, res,q);
+            res.json({success:"User registered successfully"});
+        }
+    });
 });
-
 app.put('/api/userUpdate',protectedRoutes, (req, res) => {
     let _bd = req.body;
     let q = `UpdateUserOwner ${_bd.uId},'${_bd.uEmail}','${_bd.uPhone}';`;
     deadpool(req, res,q);
+    res.json({success:"User updated"});
 });
 
 app.delete('/api/userDelete/:uId',protectedRoutes, (req, res) => {
     const{uId} = req.params;
     let q = `DeleteHouse ${uId};`; //This deletes all record related with the user (house and payments)
     deadpool(req, res,q);
+    res.json({success:"User deleted"});
 });
 
 /////////////////////////////////////////// --- House --- ///////////////////////////////////////////
@@ -180,50 +196,71 @@ app.get('/api/house/:hId',protectedRoutes, (req, res) => {
     deadpool(req, res,q);
 });
 
- app.put('/api/houseUpdate',protectedRoutes, (req, res) => {
-     let _bd = req.body;
-     let q = `UpdateHouse ${_bd.hId}, ${_bd.hNumber}, '${_bd.hAddress}', ${_bd.hMonthlyMount};`;
-     deadpool(req, res,q);
+app.put('/api/houseUpdate',protectedRoutes, (req, res) => {
+    let _bd = req.body;
+    let q = `UpdateHouse ${_bd.hId}, ${_bd.hNumber}, '${_bd.hAddress}', ${_bd.hMonthlyMount};`;
+    deadpool(req, res,q);
+    res.json({success:"House updated"});
  });
 
 /////////////////////////////////////////// --- Payment --- ///////////////////////////////////////////
 
-app.get('/api/Payments',protectedRoutes, (req, res) => {
+app.get('/api/payments',protectedRoutes, (req, res) => {
     let q = `SelectAllPayments;`;
     deadpool(req, res,q);
 });
 
-app.post('/api/paymentRegister',protectedRoutes, (req, res) => {
-    let _bd = req.body;
-    let q = `AddPayment ${_bd.pAmount}, ${_bd.hId};`;
-    deadpool(req, res,q);
-});
-
-////Payment admin
- app.put('/api/paymentUpdateA',protectedRoutes, (req, res) => {
-     let _bd = req.body;
-     let q = `UpdatePayment ${_bd.pId}, ${_bd.pAmount}, ${_bd.isValidated};`;
-     deadpool(req, res,q);
- });
-
- app.get('/api/payment/:pId',protectedRoutes, (req, res) => {
+app.get('/api/payment/:pId',protectedRoutes, (req, res) => {
     const{pId} = req.params;
     let q = `SelectPayment ${pId};`;
     deadpool(req, res,q);
 });
 
-////Payment user
-app.put('/api/paymentUpdate',protectedRoutes, (req, res) => {
+app.post('/api/paymentRegister',protectedRoutes, (req, res) => {
     let _bd = req.body;
-    let q = `UpdatePayment ${pId}, ${_bd.pImage}`;
+    let q = `AddPayment ${_bd.pAmount}, ${_bd.hNumber};`;
     deadpool(req, res,q);
+    res.json({success:"Payment done"});
 });
 
- app.delete('/api/paymentDelete/:pId',protectedRoutes, (req, res) => {
-     const{pId} = req.params;
-     let q = `DeletePayment ${pId}`;
-     deadpool(req, res,q);
+app.put('/api/paymentUpdate',protectedRoutes, (req, res) => {
+    let _bd = req.body;
+    let q = `UpdatePayment ${_bd.pId}, ${_bd.pAmount}, ${_bd.hNumber};`;
+    deadpool(req, res,q);
+    res.json({success:"Payment updated"});
  });
+
+ app.delete('/api/paymentDelete/:pId',protectedRoutes, (req, res) => {
+    const{pId} = req.params;
+    let q = `DeletePayment ${pId}`;
+    deadpool(req, res,q);
+    res.json({success:"Payment deleted"});
+});
+
+/////////////////////////////////////////// --- Upload Image --- ///////////////////////////////////////////
+
+app.put('/api/upload', protectedRoutes,(res, req)=>{ /// user uploads image to payment
+    const {uId, pImage} = req.body;
+    let q = `UploadImage ${pImage}, ${uId}`;
+    deadpool(req, res, q);
+    res.json('Payment done, waiting for confirmation.')
+});
+
+/////////////////////////////////////////// --- Verify Payment --- ///////////////////////////////////////////
+
+app.get('/api/verify', protectedRoutes,(res, req)=>{ /// get the image from the id ///
+    const {uId} = req.body;
+    let q = `SelectPaymentImage ${uId}`;
+    deadpool(req, res, q);
+    res.json('Image received.');
+});
+
+app.put('/api/verify', protectedRoutes,(res, req)=>{ /// post the verify and the amount paid ///
+    const {uId, isValidate, paidAmount} = req.body;
+    let q = `VerifyPayment ${isValidate}, ${paidAmount}, ${uId}`;
+    deadpool(req, res, q);
+    res.json('Payment verified.');
+});
 
  /////////////////////////////////////////// --- Login --- ///////////////////////////////////////////
 
@@ -244,7 +281,13 @@ app.put('/api/paymentUpdate',protectedRoutes, (req, res) => {
         await pool.connect();
         let result = await pool.request().query(q);
         let passIntheDatabase = result.recordset[0].uPwdHash;//hash
-        
+        console.log(result);
+        if(!result.recordset[0]){
+            res.json({
+                access:false,
+                message:"User does not exist"
+            });
+        }
         bcrypt.compare(pass,passIntheDatabase, function(err,_res){
             if(_res==true){
                 let _user = result.recordset[0];//it is here so you can query for more columns
@@ -263,9 +306,10 @@ app.put('/api/paymentUpdate',protectedRoutes, (req, res) => {
                         access:true, //optional
                         message:'Access granted',  //optional
                         token:token,
-                        id: result.recordset[0].uId,//optional
-                        roId:result.recordset[0].roId
-                    })
+                        id: result.recordset[0].uId,//optional //user id
+                        roId:result.recordset[0].roId,// role id
+                        uName: result.recordset[0].uName
+                    });
                 }
                 else{
                     res.json({
@@ -276,16 +320,19 @@ app.put('/api/paymentUpdate',protectedRoutes, (req, res) => {
             }else{
                 res.json({
                     access:false,
-                    message:'Not valid credentials'
-                })
-                }
-
+                    message:'Invalid password',
+                    error:err
+                });
+            }
         });
     } catch(err){ 
-        console.log(err);
+        res.json({
+            access:false,
+            message:'User does not exist',
+            error:err
+        });
     };
-
-})
+});
 
 
 /////////////////////////////////////////// --- End --- ///////////////////////////////////////////
