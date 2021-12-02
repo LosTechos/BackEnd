@@ -125,7 +125,7 @@ app.get('/api/budget', protectedRoutes, (req, res)=>{
 
 /////////////////////////////////////////// --- Get Image --- ///////////////////////////////////////////
 
-app.put('/api/ticket', protectedRoutes, (req, res)=>{
+app.put('/api/ticket', (req, res)=>{
     console.log(res.body)
     res.json(res.body)
 });
