@@ -114,6 +114,20 @@ app.get('/api/budget', protectedRoutes, (req, res)=>{
     deadpool(req, res, q);
 });
 
+/////////////////////////////////////////// --- Expenses --- ///////////////////////////////////////////
+
+app.post('/api/expenseRegister', protectedRoutes, (req, res)=>{
+    let _bd = req.body;
+    let q = `AddExpense '${_bd.eTitle}','${_bd.eDescription}',${_bd.eAmount};`;
+    deadpool(req, res, q);
+    res.json({success:"Expense registered successfully"});
+});
+
+app.get('/api/expenses', protectedRoutes, (req, res)=>{
+    let q = `SelectAllExpenses`;
+    deadpool(req, res, q);
+});
+
 /////////////////////////////////////////// --- Debt views --- ///////////////////////////////////////////
 
 app.get('/api/debt/:uId', (req, res) => {
