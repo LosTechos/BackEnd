@@ -82,11 +82,11 @@ async function deadpool(req, res, q){
         //LOGIC FOR RUNNING SQL QUERY
         const request = pool.request();
         const result = await request.query(q);
+        res.json({res:result.recordset});
         if (result.recordset) {
              if (result.recordset.length > 0) {
                 res.send(result.recordset);
             }
-            res.json({message:"No recordset found."});
             return result;
         }
         return result;
@@ -239,6 +239,13 @@ app.put('/api/upload', protectedRoutes,(req, res)=>{ /// user uploads image to p
 });
 
 /////////////////////////////////////////// --- Verify Payment --- ///////////////////////////////////////////
+
+app.get('/api/verifytest', protectedRoutes,(req, res)=>{ /// get the image from the id ///
+    const {uId} = req.body;
+    let q = `SelectPaymentImage 70`;
+    deadpool(req, res, q);
+    res.json('Image received.');
+});
 
 app.get('/api/verify', protectedRoutes,(req, res)=>{ /// get the image from the id ///
     const {uId} = req.body;
