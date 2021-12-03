@@ -40,7 +40,7 @@ app.use(cors());
 app.all('*', function(req,res,next){
     res.header('Access-Control-Allow-Origin','*');
     res.header('Access-Control-Allow-Methods','PUT,GET,POST,DELETE,OPTIONS');
-    res.header('Access-Control-Allow-Headers','Content-Type');
+    res.header('Access-Control-Allow-Headers','Accept, Content-Type, Authorization, X-Requested-With');
     next();
 });
 
@@ -77,22 +77,16 @@ app.get('/', protectedRoutes, function(req,res){
 });
 
 async function deadpool(req, res, q){
-    let _bod = req.body;
-
     await poolConnect;
-
     try {
         //LOGIC FOR RUNNING SQL QUERY
         const request = pool.request();
         const result = await request.query(q);
-        console.dir(result);
-        console.log(result);
-
+        res.json({res:result.recordset});
         if (result.recordset) {
              if (result.recordset.length > 0) {
                 res.send(result.recordset);
             }
-            res.json({message:"No me desmadres más la API, culero."});
             return result;
         }
         return result;
@@ -100,9 +94,7 @@ async function deadpool(req, res, q){
         console.error("SQL Error", err);
         res.send({sql_error: err});
     }
-
 }
-
 
 //documentation
 app.use('/api-docs',swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -110,7 +102,7 @@ app.use('/api-docs',swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 /////////////////////////////////////////// --- Get budget --- ///////////////////////////////////////////
 
 app.get('/api/budget', protectedRoutes, (req, res)=>{
-    let q = `SelectBudget`;
+    let q = `SELECT bTotal AS "budget" FROM cBudget`;
     deadpool(req, res, q);
 });
 
@@ -136,7 +128,7 @@ app.get('/api/debt/:uId', protectedRoutes, (req, res) => {
     deadpool(req, res,q);
 });
 
-app.get('/api/debt', protectedRoutes, (req, res) => {
+app.get('/api/debt', protectedRoutes, (req, res) => { 
     let q = `SELECT * from AllUserDebt_v;`;
     deadpool(req, res,q);
 });
@@ -239,23 +231,28 @@ app.put('/api/paymentUpdate',protectedRoutes, (req, res) => {
 
 /////////////////////////////////////////// --- Upload Image --- ///////////////////////////////////////////
 
-app.put('/api/upload', protectedRoutes,(res, req)=>{ /// user uploads image to payment
+app.put('/api/upload', protectedRoutes,(req, res)=>{ /// user uploads image to payment
     const {uId, pImage} = req.body;
     let q = `UploadImage ${pImage}, ${uId}`;
     deadpool(req, res, q);
-    res.json('Payment done, waiting for confirmation.')
+    res.json(pImage);
 });
 
 /////////////////////////////////////////// --- Verify Payment --- ///////////////////////////////////////////
 
-app.get('/api/verify', protectedRoutes,(res, req)=>{ /// get the image from the id ///
+app.get('/api/verifytest', protectedRoutes,(req, res)=>{ /// get the image from the id ///
+    const {uId} = req.body;
+    let q = `SelectPaymentImage 70`;
+    deadpool(req, res, q);
+});
+
+app.get('/api/verify', protectedRoutes, (req, res)=>{ /// get the image from the id ///
     const {uId} = req.body;
     let q = `SelectPaymentImage ${uId}`;
     deadpool(req, res, q);
-    res.json('Image received.');
 });
 
-app.put('/api/verify', protectedRoutes,(res, req)=>{ /// post the verify and the amount paid ///
+app.put('/api/verify', protectedRoutes,(req, res)=>{ /// post the verify and the amount paid ///
     const {uId, isValidate, paidAmount} = req.body;
     let q = `VerifyPayment ${isValidate}, ${paidAmount}, ${uId}`;
     deadpool(req, res, q);
