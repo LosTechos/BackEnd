@@ -82,7 +82,6 @@ async function deadpool(req, res, q){
         //LOGIC FOR RUNNING SQL QUERY
         const request = pool.request();
         const result = await request.query(q);
-        res.json({res:result.recordset});
         if (result.recordset) {
              if (result.recordset.length > 0) {
                 res.send(result.recordset);
@@ -91,8 +90,8 @@ async function deadpool(req, res, q){
         }
         return result;
     } catch (err) {
-        console.error("SQL Error", err);
-        res.send({sql_error: err});
+        console.error("SQL FATAL", err);
+        res.send({sql_error:err})
     }
 }
 
@@ -122,13 +121,13 @@ app.get('/api/expenses', protectedRoutes, (req, res)=>{
 
 /////////////////////////////////////////// --- Debt views --- ///////////////////////////////////////////
 
-app.get('/api/debt/:uId', (req, res) => {
+app.get('/api/debt/:uId', protectedRoutes,(req, res) => {
     const{uId} = req.params;
     let q = `SELECT * from UserDebt_v(${uId});`;
     deadpool(req, res,q);
 });
 
-app.get('/api/debt', (req, res) => { 
+app.get('/api/debt', protectedRoutes,(req, res) => { 
     let q = `SELECT * from AllUserDebt_v;`;
     deadpool(req, res,q);
 });
@@ -240,11 +239,10 @@ app.put('/api/upload', protectedRoutes,(req, res)=>{ /// user uploads image to p
 
 /////////////////////////////////////////// --- Verify Payment --- ///////////////////////////////////////////
 
-app.get('/api/verifytest', protectedRoutes,(req, res)=>{ /// get the image from the id ///
+app.get('/api/verifytest',(req, res)=>{ /// get the image from the id ///
     const {uId} = req.body;
     let q = `SelectPaymentImage 70`;
     deadpool(req, res, q);
-    res.json('Image received.');
 });
 
 app.get('/api/verify', protectedRoutes,(req, res)=>{ /// get the image from the id ///
