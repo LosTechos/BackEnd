@@ -82,7 +82,6 @@ async function deadpool(req, res, q){
         //LOGIC FOR RUNNING SQL QUERY
         const request = pool.request();
         const result = await request.query(q);
-        res.json({'jj':"Hola"});
         if (result.recordset) {
              if (result.recordset.length > 0) {
                 res.send(result.recordset);
@@ -129,7 +128,7 @@ app.get('/api/debt/:uId', (req, res) => {
     deadpool(req, res,q);
 });
 
-app.get('/api/debt', (req, res) => {
+app.get('/api/debt', (req, res) => { 
     let q = `SELECT * from AllUserDebt_v;`;
     deadpool(req, res,q);
 });
